@@ -266,14 +266,101 @@ $desktop_scores = $pagespeed_data['desktop'];
     </div>
 </div>
 	
-	
-	
+<div class="section">
+  <div class="section-inner">
+    <h2>🛡️ Security Vulnerability Report</h2>
+
+    <div class="fd-columns">
+      <!-- Core Vulnerabilities -->
+      <div class="fd-column">
+        <h3>🔧 Core</h3>
+        <?php if (!empty($core_vuln['vulnerabilities'])): ?>
+          <table class="fd-table">
+            <thead>
+              <tr>
+                <th>Issue</th>
+                <th>Description</th>
+                <th>Severity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($core_vuln['vulnerabilities'] as $vuln): ?>
+                <tr>
+                  <td><?php echo esc_html($vuln['title'] ?? '—'); ?></td>
+                  <td><?php echo esc_html(wp_strip_all_tags($vuln['description'] ?? 'No description')); ?></td>
+                  <td><?php echo esc_html($vuln['severity'] ?? 'Unknown'); ?></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        <?php else: ?>
+          <p class="fd-success">✅ No known core vulnerabilities found.</p>
+        <?php endif; ?>
+      </div>
+
+      <!-- Plugin Vulnerabilities -->
+      <div class="fd-column">
+        <h3>🔌 Plugins</h3>
+        <?php if (!empty($plugin_vuln)): ?>
+          <?php foreach ($plugin_vuln as $plugin_name => $vulns): ?>
+            <h4><?php echo esc_html($plugin_name); ?></h4>
+            <table class="fd-table">
+              <thead>
+                <tr>
+                  <th>Issue</th>
+                  <th>Description</th>
+                  <th>Severity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($vulns as $vuln): ?>
+                  <tr>
+                    <td><?php echo esc_html($vuln['title'] ?? '—'); ?></td>
+                    <td><?php echo esc_html(wp_strip_all_tags($vuln['description'] ?? 'No description')); ?></td>
+                    <td><?php echo esc_html($vuln['severity'] ?? 'Unknown'); ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p class="fd-success">✅ No known plugin vulnerabilities found.</p>
+        <?php endif; ?>
+      </div>
+
+      <!-- Theme Vulnerabilities -->
+      <div class="fd-column">
+        <h3>🎨 Themes</h3>
+        <?php if (!empty($theme_vuln)): ?>
+          <?php foreach ($theme_vuln as $theme_name => $vulns): ?>
+            <h4><?php echo esc_html($theme_name); ?></h4>
+            <table class="fd-table">
+              <thead>
+                <tr>
+                  <th>Issue</th>
+                  <th>Description</th>
+                  <th>Severity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($vulns as $vuln): ?>
+                  <tr>
+                    <td><?php echo esc_html($vuln['title'] ?? '—'); ?></td>
+                    <td><?php echo esc_html(wp_strip_all_tags($vuln['description'] ?? 'No description')); ?></td>
+                    <td><?php echo esc_html($vuln['severity'] ?? 'Unknown'); ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p class="fd-success">✅ No known theme vulnerabilities found.</p>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>   
 </div>
-	
-	
 
-
+</div>
 </body>
 </html>
-
-

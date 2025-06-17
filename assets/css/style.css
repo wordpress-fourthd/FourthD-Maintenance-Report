@@ -23,9 +23,17 @@ body {
 }
 
 @keyframes bgShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 h1 {
@@ -34,6 +42,7 @@ h1 {
   color: var(--primary-color);
   margin-bottom: 40px;
 }
+
 .fd-maintenance-heading {
   display: flex;
   align-items: center;
@@ -42,8 +51,9 @@ h1 {
   font-size: 2rem;
   text-align: center;
   margin-bottom: 40px;
-	color:black;
-  flex-wrap: wrap; /* for mobile responsiveness */
+  color: black;
+  flex-wrap: wrap;
+  /* for mobile responsiveness */
 }
 
 .fd-logo {
@@ -69,8 +79,15 @@ h1 {
 }
 
 @keyframes fadeInUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .section h2 {
@@ -157,7 +174,7 @@ code {
     color: black;
   }
 
-  
+
 
   .section h2 {
     background: #2563eb;
@@ -167,3 +184,46 @@ code {
     background: #334155;
   }
 }
+.fd-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5em;
+}
+
+.fd-table th,
+.fd-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.fd-table th {
+  background-color: #f7f7f7;
+  font-weight: 600;
+}
+
+.fd-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.fd-success {
+  color: #2e7d32;
+  font-weight: bold;
+}
+.fd-columns {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.fd-column {
+  flex: 1 1 30%;
+  min-width: 300px;
+  padding: 15px;
+  
+}
+
+.fd-column h4 {
+  margin-top: 10px;
+} 
