@@ -22,16 +22,13 @@ function fd_get_wp_core_info() {
     ];
 }
 
-/**
- * Get General WP Config Info.
- */
 function fd_get_wp_config_info() {
     if (!function_exists('get_plugins')) {
         require_once ABSPATH . 'wp-admin/includes/plugin.php';
     }
 
-    $user_count = count_users();
-    $all_plugins = get_plugins();
+    $user_count     = count_users();
+    $all_plugins    = get_plugins();
     $active_plugins = get_option('active_plugins', []);
 
     return [
@@ -44,6 +41,7 @@ function fd_get_wp_config_info() {
         'active_plugins'          => count($active_plugins),
     ];
 }
+
 
 /**
  * Get Active Theme Info.
@@ -92,7 +90,7 @@ function fd_get_folder_size($path) {
 }
 
 /**
- * Format Bytes to Human Readable.
+ * Convert bytes to human-readable format.
  */
 function fd_format_size($bytes) {
     $units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -103,7 +101,7 @@ function fd_format_size($bytes) {
 }
 
 /**
- * Get Disk Usage Information.
+ * Get disk usage data for various WP directories and DB.
  */
 function fd_get_disk_usage_info() {
     global $wpdb;
@@ -126,9 +124,28 @@ function fd_get_disk_usage_info() {
     ];
 }
 
-/**
- * Get PHP Configuration Info.
- */
+function fd_get_disk_status_label($value, $threshold_mb) {
+    $num = 0;
+
+    if (strpos($value, 'GB') !== false) {
+        $num = (float) $value * 1024;
+    } elseif (strpos($value, 'MB') !== false) {
+        $num = (float) $value;
+    } elseif (strpos($value, 'KB') !== false) {
+        $num = (float) $value / 1024;
+    } elseif (strpos($value, 'B') !== false) {
+        $num = (float) $value / 1024 / 1024;
+    }
+
+    if ($num > $threshold_mb) {
+        return '<span class="status-warning">⚠️ High</span>';
+    } else {
+        return '<span class="status-ok">✅ OK</span>';
+    }
+}
+
+
+
 function fd_get_php_config_info() {
     return [
         'max_input_vars'      => ini_get('max_input_vars'),
@@ -193,9 +210,6 @@ function fd_check_manual_gtag() {
     );
 }
 
-/**
- * Detect Google Analytics.
- */
 function fd_get_analytics_info() {
     if (!function_exists('get_plugins')) {
         require_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -210,12 +224,12 @@ function fd_get_analytics_info() {
         'exactmetrics/google-analytics-dashboard-for-wp.php',
     ];
 
-    $found = [];
+    $found_plugins = [];
 
     foreach ($known as $file) {
         foreach ($plugins as $installed => $info) {
             if (stripos($installed, dirname($file)) === 0) {
-                $found[] = [
+                $found_plugins[] = [
                     'name' => $info['Name'],
                     'status' => in_array($installed, $active) ? 'active' : 'installed',
                 ];
@@ -223,18 +237,29 @@ function fd_get_analytics_info() {
         }
     }
 
-    if (fd_check_manual_gtag()) {
-        $found[] = ['name' => 'Manual gtag.js Integration', 'status' => 'active'];
+    // Check for inline gtag or analytics.js output (in <head>)
+    $gtag_found = false;
+    ob_start();
+    wp_head(); // capture the head content
+    $head_output = ob_get_clean();
+
+    if (
+        stripos($head_output, 'gtag(') !== false ||
+        stripos($head_output, 'www.googletagmanager.com/gtag/js') !== false ||
+        stripos($head_output, 'www.google-analytics.com/analytics.js') !== false
+    ) {
+        $gtag_found = true;
     }
 
-    return empty($found)
-        ? ['found' => false, 'recommendation' => '⚠️ No Google Analytics detected.']
-        : ['found' => true, 'plugins' => $found];
+    return [
+        'found' => (count($found_plugins) > 0 || $gtag_found),
+        'plugins' => $found_plugins,
+        'gtag' => $gtag_found,
+        'recommendation' => 'Consider installing Google Site Kit, MonsterInsights, or embedding gtag.js to track analytics effectively.',
+    ];
 }
 
-/**
- * User Overview Summary.
- */
+
 function fd_get_user_overview() {
     $users = count_users();
     $roles = [];
@@ -250,9 +275,6 @@ function fd_get_user_overview() {
     ];
 }
 
-/**
- * General Recommendations.
- */
 function fd_get_general_recommendations() {
     return [
         '🖼️ Optimize large images for faster loading.',
@@ -264,13 +286,15 @@ function fd_get_general_recommendations() {
         '🔐 Enable security plugins (e.g., Wordfence).',
         '⏱️ Estimated Time: 7–10 hours.',
     ];
+
 }
 
 /**
  * PageSpeed Insights API Score Fetch.
  */
+
 function get_pagespeed_all_scores() {
-    $api_key = 'AIzaSyAQLl9psH3hYJSDDccXZUYK9R5A9vpYZhU';
+    $api_key = get_option('fd_api_key');
     $site_url = home_url();
     
     $scores = array(
@@ -284,7 +308,6 @@ function get_pagespeed_all_scores() {
 
 
 function get_all_categories_score($url, $strategy, $api_key) {
-    // Build URL with all categories
     $api_url = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed?' . http_build_query(array(
         'url' => $url,
         'key' => $api_key,
@@ -301,7 +324,8 @@ function get_all_categories_score($url, $strategy, $api_key) {
             'seo' => 'Error'
         );
     }
-    
+    echo '<!-- ' . esc_url($api_url) . ' -->';
+
     $body = wp_remote_retrieve_body($response);
     $data = json_decode($body, true);
     
@@ -344,9 +368,7 @@ function fd_check_core_vulnerabilities() {
     return $data ?: ['note' => 'No vulnerabilities found.'];
 }
 
-/**
- * Plugin Vulnerability Check.
- */
+
 function fd_check_plugin_vulnerabilities() {
     if (!function_exists('get_plugins')) {
         require_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -367,9 +389,7 @@ function fd_check_plugin_vulnerabilities() {
     return $vulns;
 }
 
-/**
- * Theme Vulnerability Check.
- */
+
 function fd_check_theme_vulnerabilities() {
     $themes = wp_get_themes();
     $vulns = [];

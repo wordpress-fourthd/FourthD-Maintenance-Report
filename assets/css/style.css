@@ -78,6 +78,7 @@ h1 {
   animation: fadeInUp 0.6s ease;
 }
 
+
 @keyframes fadeInUp {
   from {
     transform: translateY(20px);
@@ -210,20 +211,3 @@ code {
   color: #2e7d32;
   font-weight: bold;
 }
-.fd-columns {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-top: 20px;
-}
-
-.fd-column {
-  flex: 1 1 30%;
-  min-width: 300px;
-  padding: 15px;
-  
-}
-
-.fd-column h4 {
-  margin-top: 10px;
-} 
